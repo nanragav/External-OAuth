@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+authlib
+python-dotenv
+sqlalchemy
+starlette
+itsdangerous
+httpx
+python-jose
