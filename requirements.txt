@@ -7,3 +7,4 @@ starlette
 itsdangerous
 httpx
 python-jose
+cryptography

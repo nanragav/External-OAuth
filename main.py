@@ -7,6 +7,10 @@ import os
 from google_router import google_login
 import uvicorn
 
+from generate_cert import cert_gen
+
+cert_gen()
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 ssl_keyfile = os.path.join(current_dir, 'certs', 'key.pem')
