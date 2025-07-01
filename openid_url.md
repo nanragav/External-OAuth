@@ -23,4 +23,4 @@ This list provides the server metadata (discovery) URLs for popular OAuth and Op
 | **ForgeRock**             | [https://<FORGEROCK_DOMAIN>/oauth2/.well-known/openid-configuration](https://<FORGEROCK_DOMAIN>/oauth2/.well-known/openid-configuration)                         | Full OIDC support                                |
 | **NetIQ**                 | [https://<DOMAIN>/nidp/oauth/.well-known/openid-configuration](https://<DOMAIN>/nidp/oauth/.well-known/openid-configuration)                               | Enterprise identity provider                     |
 | **Bitbucket (Atlassian)** | Not supported                                                                              | OAuth 2.0 only                                   |
-|
+
