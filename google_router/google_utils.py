@@ -1,10 +1,9 @@
 from oauth_utils.oauth_init import oauth
 from fastapi import Request, HTTPException
 from authlib.integrations.starlette_client import OAuthError
-import logging
+from init_utils.logger_init import logger
 import httpx
 
-logger = logging.getLogger(__name__)
 
 async def get_redirect(request: Request):
 

@@ -1,9 +1,7 @@
 from fastapi import HTTPException, Request, APIRouter
 from .google_utils import get_redirect, get_callback
 from authlib.integrations.starlette_client import OAuthError
-import logging
-
-logger = logging.getLogger(__name__)
+from init_utils.logger_init import logger
 
 router = APIRouter(tags=['/Google OAuth'])
 

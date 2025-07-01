@@ -4,15 +4,16 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
 from datetime import datetime, timedelta, UTC
 import os
-from google_router.google_utils import logger
+from init_utils.logger_init import logger
 
 def cert_gen():
 
     current_dirt = os.path.dirname(os.path.abspath(__file__))
 
-
     key_file = os.path.join(current_dirt, 'certs/key.pem')
     cert_file = os.path.join(current_dirt, 'certs/cert.pem')
+
+    os.makedirs(os.path.dirname(key_file), exist_ok=True)
 
     # Generate an RSA private key
     private_key = rsa.generate_private_key(

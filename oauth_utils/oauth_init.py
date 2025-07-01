@@ -1,11 +1,7 @@
 from authlib.integrations.starlette_client import OAuth, OAuthError
-from starlette.config import Config
-import logging
+from init_utils.logger_init import logger
 from fastapi import HTTPException
-
-logger = logging.getLogger(__name__)
-
-config = Config('.env')
+from init_utils.init_config import config
 
 try:
 
