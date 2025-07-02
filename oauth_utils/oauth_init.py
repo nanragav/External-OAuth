@@ -13,7 +13,7 @@ try:
         client_secret=config('GOOGLE_CLIENT_SECRET'),
         server_metadata_url=config('GOOGLE_SERVER_METADATA_URL'),
         client_kwargs={
-            'scope': 'openid profile email',
+            'scope': 'openid profile email https://www.googleapis.com/auth/drive',
             'consent': 'true'
         }
     )

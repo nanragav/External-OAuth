@@ -43,11 +43,28 @@ async def get_callback(request: Request):
 
         async with httpx.AsyncClient() as client:
 
-            response = await client.get('https://openidconnect.googleapis.com/v1/userinfo', headers={'Authorization': f"Bearer {token['access_token']}"})
+            user_response = await client.get('https://openidconnect.googleapis.com/v1/userinfo', headers={'Authorization': f"Bearer {token['access_token']}"})
 
-        user = response.json()
+            user = user_response.json()
 
-        return user
+            drive_response = await client.get(
+                'https://www.googleapis.com/drive/v3/files',
+                headers={'Authorization': f"Bearer {token['access_token']}"}
+            )
+
+            if drive_response.status_code == 403:
+                raise HTTPException(
+                    status_code=403,
+                    detail='Google Drive access denied. Please grant Drive scope and try again.'
+                )
+
+            elif drive_response.status_code != 200:
+                logger.error(f'Drive API failed: {drive_response.text}')
+                raise HTTPException(status_code=drive_response.status_code, detail='Failed to fetch Google Drive data.')
+
+            drive = drive_response.json()
+
+        return drive
 
     except OAuthError as oe:
 

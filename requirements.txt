@@ -8,3 +8,6 @@ itsdangerous
 httpx
 python-jose
 cryptography
+aiomysql
+pymysql
+pydantic

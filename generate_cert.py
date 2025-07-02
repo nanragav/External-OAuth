@@ -25,7 +25,7 @@ def cert_gen():
     with open(key_file, "wb") as f:
         f.write(private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,  # For .key file
+            format=serialization.PrivateFormat.PKCS8,  # For .key file
             encryption_algorithm=serialization.NoEncryption()  # No password
         ))
 
