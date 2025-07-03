@@ -1,7 +1,10 @@
 from fastapi import HTTPException, Request, APIRouter
+from starlette.responses import JSONResponse
+from oauth_utils.oauth_init import oauth
 from .google_utils import get_redirect, get_callback
 from authlib.integrations.starlette_client import OAuthError
 from init_utils.logger_init import logger
+from fastapi.responses import RedirectResponse
 
 router = APIRouter(tags=['/Google OAuth'])
 
@@ -34,6 +37,10 @@ async def google_callback(request: Request):
     try:
 
         user = await get_callback(request=request)
+
+        if isinstance(user, JSONResponse):
+
+            pass
 
         return user
 

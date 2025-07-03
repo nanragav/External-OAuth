@@ -43,7 +43,7 @@ async def generate_access_token(data: dict):
 
         logger.error(f"Value error during token generation: {e}")
 
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Vital detail mismatched')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Detail mismatched')
 
     except HTTPException as he:
 
@@ -54,3 +54,44 @@ async def generate_access_token(data: dict):
         logger.error(f"Unexpected error in generate_access_token: {e}")
 
         raise HTTPException(status_code=500, detail='Internal Server Error')
+
+
+async def decode_access_token(token: str):
+
+    try:
+
+        with open(pub_key_path, 'rb') as f:
+
+            pub_key = f.read().__str__()
+
+        return jwt.decode(token=token, key=pub_key, algorithms=[config('ALGORITHM')])
+
+    except JWTError as e:
+
+        logger.error(f"JWT error during decoding: {e}")
+
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='Error while token verification')
+
+    except InvalidSignature as e:
+
+        logger.error(f"Invalid signature while signing token: {e}")
+
+        raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail='Signature Verification Failed')
+
+    except ValueError as e:
+
+        logger.error(f"Value error during token validation: {e}")
+
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Detail mismatched')
+
+    except HTTPException as he:
+
+        raise he
+
+    except Exception as e:
+
+        logger.error(f"Unexpected error in decode_access_token: {e}")
+
+        raise HTTPException(status_code=500, detail='Internal Server Error')
+
+
