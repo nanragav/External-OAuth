@@ -8,6 +8,7 @@ from google_router import google_login
 import uvicorn
 from init_utils.logger_init import logger
 from generate_cert import cert_gen
+from generate_jwt_secret import generate_key
 
 certs_dir = "certs"
 key_path = os.path.join(certs_dir, "key.pem")
@@ -26,6 +27,22 @@ ssl_keyfile = os.path.join(current_dir, 'certs', 'key.pem')
 
 ssl_certfile = os.path.join(current_dir, 'certs', 'cert.pem')
 
+keys_dir = 'keys'
+
+priv_path = os.path.join(keys_dir, 'private.pem')
+
+pub_path = os.path.join(keys_dir, 'public.pem')
+
+if not os.path.exists(keys_dir) or not os.path.isfile(priv_path) or not os.path.isfile(pub_path):
+
+    logger.error("🔔 Missing Jwt Secrets Private Key and Public Key. Generating new keys...")
+
+    generate_key()
+
+else:
+
+    logger.error("✅ Keys already exist. Skipping generation.")
+
 load_dotenv()
 
 app = FastAPI()
@@ -42,4 +59,4 @@ async def root(request: Request):
 
 if __name__ == '__main__':
 
-    uvicorn.run(app='main:app', host='0.0.0.0', port=8000, reload=True, ssl_keyfile=ssl_keyfile, ssl_certfile=ssl_certfile)
+    uvicorn.run(app='main:app', host='0.0.0.0', reload=True, port=8000, ssl_keyfile=ssl_keyfile, ssl_certfile=ssl_certfile)

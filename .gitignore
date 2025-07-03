@@ -3,3 +3,6 @@
 .idea
 review/backup_root.py
 certs
+keys
+alembic
+alembic.ini
