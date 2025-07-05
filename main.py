@@ -47,7 +47,7 @@ load_dotenv()
 
 app = FastAPI()
 
-app.add_middleware(SessionMiddleware, secret_key=config('SESSION_COOKIE_SECRET'))
+app.add_middleware(SessionMiddleware, secret_key=config('SESSION_COOKIE_SECRET'), session_cookie="session")
 
 app.include_router(google_login.router)
 
@@ -149,4 +149,4 @@ async def root(request: Request):
 
 if __name__ == '__main__':
 
-    uvicorn.run(app='main:app', host='0.0.0.0', port=8000, ssl_keyfile=ssl_keyfile, ssl_certfile=ssl_certfile)
+    uvicorn.run(app='main:app', host='0.0.0.0', port=8000, reload=True, ssl_keyfile=ssl_keyfile, ssl_certfile=ssl_certfile)

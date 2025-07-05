@@ -1,10 +1,12 @@
 from oauth_utils.oauth_init import oauth
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi import Response
 from authlib.integrations.starlette_client import OAuthError
 from init_utils.logger_init import logger
 import httpx
 from init_utils.init_config import config
+from urllib.parse import unquote
 
 
 async def get_redirect(request: Request):
@@ -20,6 +22,12 @@ async def get_redirect(request: Request):
         logger.error(f'Error in OAuth Redirect {oe}')
 
         return JSONResponse(status_code=400, content='Cannot Redirect with the provider')
+
+    except KeyError as ke:
+
+        logger.error(f'Error in Environmental Key Files {ke}')
+
+        return JSONResponse(status_code=404, content='Cannot find the environmental value')
 
     except Exception as e:
 
@@ -40,15 +48,15 @@ async def get_callback(request: Request):
 
         async with httpx.AsyncClient() as client:
 
-            user_response = await client.get(url=config('GOOGLE_GET_USERINFO'), headers={'Authorization': f"Bearer {token['access_token']}"})
+            user_response = await client.get(url=config('GOOGLE_GET_USERINFO'), headers={'Authorization': f"Bearer {token['access_token']}"})\
 
             if user_response.status_code == 403:
 
-                return JSONResponse(status_code=403, content='Please grant access in Google Authorization Page')
+                return JSONResponse(status_code=403, content='Please grant access in Google Authorization Page'), None
 
             if user_response.status_code != 200:
 
-                return JSONResponse(status_code=user_response.status_code, content='Failed to fetch User Scope. Try again')
+                return JSONResponse(status_code=user_response.status_code, content='Failed to fetch User Scope. Try again'), None
 
             user = user_response.json()
 
@@ -58,11 +66,11 @@ async def get_callback(request: Request):
 
                 if drive_response.status_code == 403:
 
-                    return JSONResponse(status_code=403, content='Drive Access Denied')
+                    return None, JSONResponse(status_code=403, content='Drive Access Denied')
 
                 if drive_response.status_code != 200:
 
-                    return JSONResponse(status_code=drive_response.status_code, content='Unable to Access the user Drive')
+                    return None, JSONResponse(status_code=drive_response.status_code, content='Unable to Access the user Drive')
 
                 drive = drive_response.json()
 
@@ -82,16 +90,17 @@ async def get_callback(request: Request):
 
         logger.error(f'Error in OAuth callback {oe}')
 
-        return JSONResponse(status_code=400, content='Please allow authorize to continue')
+        return JSONResponse(status_code=400, content='Please allow authorize to continue'), None
 
     except KeyError as ke:
 
         logger.error(f'Environment File does not contain the key {ke}')
 
-        return JSONResponse(status_code=404, content='Environmental File missing the key')
+        return JSONResponse(status_code=404, content='Environmental File missing the key'), None
 
     except Exception as e:
 
         logger.error(f'Unknown error in OAuth Callback {e}')
 
-        return JSONResponse(status_code=500, content='Failed with unknown Error')
+        return JSONResponse(status_code=500, content='Failed with unknown Error, Check all access is granted'), None
+
