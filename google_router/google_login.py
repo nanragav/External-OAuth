@@ -1,4 +1,5 @@
-from fastapi import HTTPException, Request, APIRouter, Depends
+from datetime import datetime, UTC, timedelta
+from fastapi import HTTPException, Request, APIRouter, Depends, Response
 from starlette.responses import JSONResponse
 from oauth_utils.oauth_init import oauth
 from .google_utils import get_redirect, get_callback
@@ -10,6 +11,7 @@ from json import JSONDecodeError
 from crud_utils.crud import adduserinfo
 from database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+from schemas import GetPhoneNumber
 
 router = APIRouter(tags=['/Google OAuth'])
 
@@ -43,13 +45,31 @@ async def google_login(request: Request):
         raise HTTPException(status_code=500, detail='Server Error while login a connection with Provider')
 
 @router.get('/auth/google/callback')
-async def google_callback(request: Request, db: AsyncSession = Depends(get_db)):
+async def google_callback(request: Request, response: Response, db: AsyncSession = Depends(get_db), error: str = None, state: str = None):
 
     try:
+
+        if state:
+
+            response.set_cookie(key='state', value=state, httponly=True)
+
+        if error:
+
+            error_details = {
+                "error_type": error,
+                "message": "Required Full Access"
+            }
+
+            return RedirectResponse(
+                url=f'/google/error?error={json.dumps(error_details)}',
+                # In the Future, I will enhance this with the redis id to reference the error to display
+                status_code=303
+            )
 
         user, drive = await get_callback(request=request)
 
         if isinstance(user, JSONResponse):
+
             error_details = {
                 "error_type": "Google Authorization Error",
                 "message": user.body.decode('utf-8')
@@ -59,6 +79,7 @@ async def google_callback(request: Request, db: AsyncSession = Depends(get_db)):
                 url=f'/google/error?error={json.dumps(error_details)}',  # In the Future, I will enhance this with the redis id to reference the error to display
                 status_code=303
             )
+
 
         if isinstance(drive, JSONResponse):
             error_details = {
@@ -71,21 +92,23 @@ async def google_callback(request: Request, db: AsyncSession = Depends(get_db)):
                 status_code=303
             )
 
-        if not user.get('phone_number'):
 
-            error_details = {'error_type': 'Detail Missing', 'message': 'Phone Number is Missing'}
 
-            return RedirectResponse(
-                url=f'/google/error?error={json.dumps(error_details)}', status_code=303
-            )
-
-        if not user.get('email_verified'):
-
-            error_details = {'error_type': 'Not Verified', 'message': 'Email is not verified'}
-
-            return RedirectResponse(
-                url=f'/google/error?error={json.dumps(error_details)}', status_code=303
-            )
+        # if not user.get('phone_number'):
+        #
+        #     error_details = {'error_type': 'Detail Missing', 'message': 'Phone Number is Missing'}
+        #
+        #     return RedirectResponse(
+        #         url=f'/google/error?error={json.dumps(error_details)}', status_code=303
+        #     )
+        #
+        # if not user.get('email_verified'):
+        #
+        #     error_details = {'error_type': 'Not Verified', 'message': 'Email is not verified'}
+        #
+        #     return RedirectResponse(
+        #         url=f'/google/error?error={json.dumps(error_details)}', status_code=303
+        #     )
 
         return user, drive
 
@@ -239,3 +262,11 @@ async def google_error(request: Request, error: str = None):
         logger.error(f'Unknown error in Google Error {e}')
 
         raise HTTPException(status_code=500, detail='Server Error while handling the error')
+
+#
+# @router.post('get-user-phone-number')
+# async def get_user_number(phone_number: GetPhoneNumber):
+#
+#     try:
+#
+
