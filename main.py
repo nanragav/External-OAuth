@@ -51,12 +51,102 @@ app.add_middleware(SessionMiddleware, secret_key=config('SESSION_COOKIE_SECRET')
 
 app.include_router(google_login.router)
 
+
 @app.get('/', response_class=HTMLResponse)
 async def root(request: Request):
-
     return '''
-    <a href='/google-login'>Login with Google</a>'''
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OAuth Login Page</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+                background-color: #f0f2f5;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            .login-container {
+                background-color: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                padding: 40px;
+                text-align: center;
+                max-width: 400px;
+                width: 100%;
+            }
+            .login-title {
+                color: #333;
+                margin-bottom: 30px;
+                font-size: 24px;
+                font-weight: 500;
+            }
+            .google-login-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #4285f4;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 12px 24px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                width: 90%;
+                text-decoration: none;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .google-login-btn:hover {
+                background-color: #357ae8;
+            }
+            .google-login-btn img {
+                width: 24px;
+                height: 24px;
+                margin-right: 12px;
+            }
+            .additional-info {
+                margin-top: 20px;
+                color: #666;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="login-container">
+            <h1 class="login-title">Welcome to OAuth Login</h1>
+
+            <a href='/google-login' class="google-login-btn">
+                Login with Google
+            </a>
+
+            <div class="additional-info">
+                <p>Secure login using Google OAuth 2.0</p>
+            </div>
+        </div>
+
+        <script>
+            document.querySelector('.google-login-btn').addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+            });
+         
+            document.querySelector('.google-login-btn').addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        </script>
+    </body>
+    </html>
+    '''
+
 
 if __name__ == '__main__':
 
-    uvicorn.run(app='main:app', host='0.0.0.0', reload=True, port=8000, ssl_keyfile=ssl_keyfile, ssl_certfile=ssl_certfile)
+    uvicorn.run(app='main:app', host='0.0.0.0', port=8000, ssl_keyfile=ssl_keyfile, ssl_certfile=ssl_certfile)

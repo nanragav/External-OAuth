@@ -3,6 +3,7 @@ from cryptography.hazmat.primitives import serialization
 import os
 from init_utils.logger_init import logger
 from cryptography.exceptions import UnsupportedAlgorithm, InvalidKey
+from fastapi import HTTPException, status
 
 def generate_key():
 
