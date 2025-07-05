@@ -10,7 +10,8 @@ class User(Base):
     id = Column(String(36), default=uuid4, nullable=False)
     user_name = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
-    session = Column(String(36), nullable=False, default=uuid4)
+    phone_number = Column(String(15), nullable=False, unique=True)
+    session_id = Column(String(36), nullable=False, default=uuid4)
 
     drives = relationship('Drive', back_populates='owner')
 
@@ -26,6 +27,7 @@ class Drive(Base):
     file_name = Column(String(255), nullable=False)
     file_id = Column(BigInteger, nullable=False)
     user_id = Column(String(36), nullable=False)
+    mime_type = Column(String(255), nullable=True)
 
     owner = relationship('User', back_populates='drives')
 
